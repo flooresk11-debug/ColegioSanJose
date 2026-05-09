@@ -1,0 +1,89 @@
+﻿@model ColegioSanJose.Models.DB.Materia
+@{
+    ViewData["Title"] = "Detalle Materia";
+}
+
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" style="margin-bottom:.5rem;">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+                <li class="breadcrumb-item"><a asp-action="Index">Materias</a></li>
+                <li class="breadcrumb-item active">Detalle</li>
+            </ol>
+        </nav>
+        <h1><i class="bi bi-journal-text me-2"></i>@Model.NombreMateria</h1>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card-custom">
+                <div class="card-header"><i class="bi bi-info-circle me-2"></i>Información</div>
+                <div class="card-body">
+                    <dl>
+                        <dt style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#a0aec0;">Materia</dt>
+                        <dd style="font-weight:600;color:#0f2044;margin-bottom:1rem;">@Model.NombreMateria</dd>
+                        <dt style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#a0aec0;">Docente</dt>
+                        <dd style="font-weight:600;color:#0f2044;">@Model.Docente</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <a asp-action="Edit" asp-route-id="@Model.MateriaId" class="btn-gold btn w-100"><i class="bi bi-pencil me-1"></i>Editar</a>
+                <a asp-action="Index" class="btn-outline-navy btn w-100"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card-custom">
+                <div class="card-header d-flex justify-content-between">
+                    <span><i class="bi bi-people me-2"></i>Alumnos Inscritos</span>
+                    <span class="badge" style="background:#f0ece4;color:#0f2044;font-weight:600;">@Model.Expedientes.Count</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (!Model.Expedientes.Any())
+                    {
+                        <div class="text-center py-4" style="color:#718096;"><p>Sin alumnos inscritos.</p></div>
+                    }
+                    else
+                    {
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>Grado</th>
+                                    <th>Nota Final</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var exp in Model.Expedientes)
+                                {
+                                    var nota = exp.NotaFinal ?? 0;
+                                    var cls = nota >= 9 ? "nota-ex" : nota >= 7 ? "nota-bu" : nota >= 5 ? "nota-re" : "nota-df";
+                                    <tr>
+                                        <td style="font-weight:600;">@exp.Alumno?.NombreCompleto</td>
+                                        <td style="font-size:.85rem;color:#718096;">@exp.Alumno?.Grado</td>
+                                        <td>
+                                            @if (exp.NotaFinal.HasValue)
+                                            {
+                                                <span class="badge-nota @cls">@exp.NotaFinal.Value.ToString("F1")</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span style="color:#a0aec0;">—</span>
+                                            }
+                                        </td>
+                                        <td style="font-size:.85rem;color:#718096;">@(exp.Observaciones ?? "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

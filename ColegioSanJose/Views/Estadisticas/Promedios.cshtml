@@ -1,0 +1,187 @@
+﻿@using ColegioSanJose.Controllers
+@model IEnumerable<PromedioAlumnoVM>
+@{
+    ViewData["Title"] = "Estadísticas";
+    var promedioMaterias = ViewBag.PromedioMaterias as IEnumerable<PromedioMateriaVM> ?? new List<PromedioMateriaVM>();
+    int total = ViewBag.Total ?? 0;
+    int sobresaliente = ViewBag.Sobresaliente ?? 0;
+    int bueno = ViewBag.Bueno ?? 0;
+    int regular = ViewBag.Regular ?? 0;
+    int deficiente = ViewBag.Deficiente ?? 0;
+}
+
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" style="margin-bottom:.5rem;">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+                <li class="breadcrumb-item active">Estadísticas</li>
+            </ol>
+        </nav>
+        <h1><i class="bi bi-bar-chart-line me-2"></i>Estadísticas Académicas</h1>
+    </div>
+</div>
+
+<div class="container pb-5">
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="background:linear-gradient(135deg,#0f2044,#1a3a6b);color:#fff;">
+                <div class="stat-label" style="color:rgba(255,255,255,.6);">Total notas</div>
+                <div class="stat-value">@total</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="background:#d1fae5;">
+                <div class="stat-label" style="color:#065f46;">Sobresaliente (≥9)</div>
+                <div class="stat-value" style="color:#065f46;">@sobresaliente</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="background:#dbeafe;">
+                <div class="stat-label" style="color:#1e40af;">Bueno (7–8.9)</div>
+                <div class="stat-value" style="color:#1e40af;">@bueno</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card" style="background:#fef3c7;">
+                <div class="stat-label" style="color:#92400e;">Regular/Deficiente</div>
+                <div class="stat-value" style="color:#92400e;">@(regular + deficiente)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card-custom h-100">
+                <div class="card-header"><i class="bi bi-bar-chart me-2"></i>Promedio por Alumno</div>
+                <div class="card-body">
+                    <canvas id="chartAlumnos" style="max-height:320px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card-custom h-100">
+                <div class="card-header"><i class="bi bi-pie-chart me-2"></i>Distribución de Notas</div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <canvas id="chartDistribucion" style="max-height:280px;max-width:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card-custom">
+                <div class="card-header"><i class="bi bi-graph-up me-2"></i>Promedio por Materia</div>
+                <div class="card-body">
+                    <canvas id="chartMaterias" style="max-height:280px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-custom">
+        <div class="card-header"><i class="bi bi-trophy me-2"></i>Ranking de Promedios por Alumno</div>
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5" style="color:#718096;">
+                    <p>No hay datos de notas registrados aún.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Alumno</th>
+                                <th>Grado</th>
+                                <th>Promedio</th>
+                                <th>Materias</th>
+                                <th>Nota Máx.</th>
+                                <th>Nota Mín.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int rank = 1;
+                            }
+                            @foreach (var p in Model)
+                            {
+                                var cls = p.Promedio >= 9 ? "nota-ex" : p.Promedio >= 7 ? "nota-bu" : p.Promedio >= 5 ? "nota-re" : "nota-df";
+                                <tr>
+                                    <td>
+                                        @if (rank == 1)
+                                        {
+                                            <span style="font-size:1.1rem;">🥇</span>
+                                        }
+                                        else if (rank == 2)
+                                        {
+
+                                            <span style="font-size:1.1rem;">🥈</span>
+                                        }
+                                        else if (rank == 3)
+                                        {
+
+                                            <span style="font-size:1.1rem;">🥉</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span style="color:#a0aec0;font-size:.85rem;">@rank</span>
+                                        }
+                                    </td>
+                                    <td style="font-weight:600;color:#0f2044;">@p.NombreCompleto</td>
+                                    <td style="font-size:.85rem;color:#718096;">@p.Grado</td>
+                                    <td>
+                                        <span class="badge-nota @cls" style="font-size:.95rem;font-weight:700;">
+                                            @p.Promedio.ToString("F2")
+                                        </span>
+                                    </td>
+                                    <td style="text-align:center;">@p.TotalMaterias</td>
+                                    <td><span class="badge-nota nota-ex">@p.NotaMaxima.ToString("F1")</span></td>
+                                    <td><span class="badge-nota nota-df">@p.NotaMinima.ToString("F1")</span></td>
+                                </tr>
+                                rank++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const alumnosLabels = [@Html.Raw(string.Join(",", Model.Select(p => $"'{p.NombreCompleto}'")))];
+        const alumnosPromedios = [@string.Join(",", Model.Select(p => p.Promedio.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))];
+        const materiasLabels = [@Html.Raw(string.Join(",", promedioMaterias.Select(m => $"'{m.NombreMateria}'")))];
+        const materiasPromedios = [@string.Join(",", promedioMaterias.Select(m => m.Promedio.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))];
+        const colorsByNota = alumnosPromedios.map(n => n >= 9 ? '#10b981' : n >= 7 ? '#3b82f6' : n >= 5 ? '#f59e0b' : '#ef4444');
+
+        new Chart(document.getElementById('chartAlumnos'), {
+            type: 'bar',
+            data: { labels: alumnosLabels, datasets: [{ label: 'Promedio', data: alumnosPromedios, backgroundColor: colorsByNota, borderRadius: 6 }] },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 10 } } }
+        });
+
+        new Chart(document.getElementById('chartDistribucion'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Sobresaliente', 'Bueno', 'Regular', 'Deficiente'],
+                datasets: [{ data: [@sobresaliente, @bueno, @regular, @deficiente], backgroundColor: ['#10b981','#3b82f6','#f59e0b','#ef4444'], borderWidth: 2, borderColor: '#fff' }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } }, cutout: '62%' }
+        });
+
+        new Chart(document.getElementById('chartMaterias'), {
+            type: 'bar',
+            data: { labels: materiasLabels, datasets: [{ label: 'Promedio', data: materiasPromedios, backgroundColor: '#0f2044cc', borderRadius: 6 }] },
+            options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { min: 0, max: 10 } } }
+        });
+    </script>
+}

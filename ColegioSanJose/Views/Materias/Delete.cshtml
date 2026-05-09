@@ -1,0 +1,50 @@
+﻿@model ColegioSanJose.Models.DB.Materia
+@{
+    ViewData["Title"] = "Eliminar Materia";
+}
+
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" style="margin-bottom:.5rem;">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+                <li class="breadcrumb-item"><a asp-action="Index">Materias</a></li>
+                <li class="breadcrumb-item active">Eliminar</li>
+            </ol>
+        </nav>
+        <h1><i class="bi bi-journal-x me-2"></i>Eliminar Materia</h1>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card-custom" style="border-top:4px solid #ef4444;">
+                <div class="card-header" style="color:#991b1b;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </div>
+                <div class="card-body">
+                    <div style="background:#fee2e2;border-radius:8px;padding:1rem;margin-bottom:1.2rem;font-size:.9rem;color:#991b1b;">
+                        ¿Desea eliminar la materia <strong>@Model.NombreMateria</strong>?
+                        También se eliminarán sus expedientes asociados.
+                    </div>
+                    <dl>
+                        <dt style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#a0aec0;">Materia</dt>
+                        <dd style="font-weight:600;color:#0f2044;margin-bottom:.8rem;">@Model.NombreMateria</dd>
+                        <dt style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#a0aec0;">Docente</dt>
+                        <dd style="font-weight:600;color:#0f2044;">@Model.Docente</dd>
+                    </dl>
+                    <form asp-action="Delete" method="post" class="d-flex gap-2 mt-3">
+                        <input type="hidden" asp-for="MateriaId" />
+                        <button type="submit" class="btn w-100" style="background:#ef4444;color:#fff;border-radius:8px;font-weight:600;">
+                            <i class="bi bi-trash me-1"></i>Eliminar
+                        </button>
+                        <a asp-action="Index" class="btn-outline-navy btn w-100">
+                            <i class="bi bi-arrow-left me-1"></i>Cancelar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
